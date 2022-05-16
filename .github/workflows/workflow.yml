@@ -162,7 +162,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.pat }}
         
-    - run: docker pull ghcr.io/yikespickles/pickles:buildcache
+    - run: docker pull ghcr.io/cvs-health-poc/pickled:buildcache
         
      # Creates a kubernetes secret on your Azure Kubernetes Service cluster that matches up to the credentials from the last step
     - name: Create K8s secret for pulling image from ACR
@@ -180,6 +180,6 @@ jobs:
       with:
         action: deploy
         manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
-        images: ghcr.io/yikespickles/pickles:buildcache
+        images: ghcr.io/cvs-health-poc/pickled:buildcache
         imagepullsecrets: ${{ env.IMAGE_PULL_SECRET_NAME }}
 
