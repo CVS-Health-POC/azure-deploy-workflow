@@ -98,9 +98,9 @@ jobs:
     - name: Create K8s secret for pulling image from ACR
       uses: Azure/k8s-create-secret@v1.1
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ env.DOCKER_PASSWORD }}
+        container-registry-url: ghcr.io
+        container-registry-username: ${{ github.actor }}
+        container-registry-password: ${{ env.DOCKER_PASSWORD }}
         secret-name: ${{ env.IMAGE_PULL_SECRET_NAME }}  
   deploy:
       permissions:
