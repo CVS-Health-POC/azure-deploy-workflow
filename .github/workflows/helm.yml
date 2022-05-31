@@ -65,7 +65,7 @@ env:
   CLUSTER_NAME: "cvs-poc-aks"
   IMAGE_PULL_SECRET_NAME: "imagesec"
   CHART_PATH: "./pickled/"
-  CHART_OVERRIDE_PATH: "./pickled/"
+  CHART_OVERRIDE_PATH: "./pickled/values-override.yaml"
   DOCKER_IMAGE: ${{ inputs.registry }}/${{ github.repository }}
   DOCKER_PASSWORD: ${{ secrets.password || secrets.GITHUB_TOKEN }}
 
