@@ -66,6 +66,8 @@ env:
   IMAGE_PULL_SECRET_NAME: "imagesec"
   CHART_PATH: "./pickled/"
   CHART_OVERRIDE_PATH: "./pickled/"
+  DOCKER_IMAGE: ${{ inputs.registry }}/${{ github.repository }}
+  DOCKER_PASSWORD: ${{ secrets.password || secrets.GITHUB_TOKEN }}
 
 jobs:
   createSecret:
