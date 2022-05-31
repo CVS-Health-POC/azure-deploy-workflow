@@ -34,30 +34,8 @@ name: Build and deploy an app to AKS with Helm
 
 on:
   workflow_call:
-    inputs:
-      registry:
-        description: Docker registry
-        default: ghcr.io
-        required: false
-        type: string
-
-      username:
-        description: Docker registry username
-        default: ${{ github.actor }}
-        required: false
-        type: string
-
-      dockerfile:
-        description: Dockerfile path
-        default: ./Dockerfile
-        required: false
-        type: string
-    
-    secrets:
-      password:
-        description: Dockerfile registry password
-        required: false 
   workflow_dispatch:
+  
 env:
   AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
   CONTAINER_NAME: "your-container-name"
@@ -65,7 +43,6 @@ env:
   CLUSTER_NAME: "cvs-poc-aks"
   IMAGE_PULL_SECRET_NAME: "imagesec"
   CHART_PATH: "./pickled/"
-  CHART_OVERRIDE_PATH: "./pickled/values-override.yaml"
   DOCKER_IMAGE: ${{ inputs.registry }}/${{ github.repository }}
   DOCKER_PASSWORD: ${{ secrets.password || secrets.GITHUB_TOKEN }}
 
