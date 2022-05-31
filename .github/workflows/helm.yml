@@ -33,11 +33,31 @@
 name: Build and deploy an app to AKS with Helm
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      registry:
+        description: Docker registry
+        default: ghcr.io
+        required: false
+        type: string
 
+      username:
+        description: Docker registry username
+        default: ${{ github.actor }}
+        required: false
+        type: string
+
+      dockerfile:
+        description: Dockerfile path
+        default: ./Dockerfile
+        required: false
+        type: string
+    
+    secrets:
+      password:
+        description: Dockerfile registry password
+        required: false 
+  workflow_dispatch:
 env:
   AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
   CONTAINER_NAME: "your-container-name"
