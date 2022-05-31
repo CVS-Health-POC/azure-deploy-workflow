@@ -68,21 +68,14 @@ env:
 
 jobs:
 
-  deploy:
+  createSecret:
     permissions:
-      actions: read
       contents: read
       id-token: write
-      packages: write
-    
     runs-on: ubuntu-latest
-
     steps:
-    # Checks out the repository this file is in
-    - uses: actions/checkout@v3
-    
     # Logs in with your Azure credentials
-    - name: Azure login
+    - name: Log in with Azure
       uses: azure/login@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
@@ -93,30 +86,58 @@ jobs:
       with:
         resource-group: ${{ env.RESOURCE_GROUP }}
         cluster-name: ${{ env.CLUSTER_NAME }}
-  
+
     - name: Login to Docker registry
       uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ env.DOCKER_PASSWORD }}
-        
-        
-     # Creates a kubernetes secret on your Azure Kubernetes Service cluster that matches up to the credentials from the last step
+
+    # Creates a kubernetes secret on your Azure Kubernetes Service cluster that matches up to the credentials from the last step
     - name: Create K8s secret for pulling image from ACR
       uses: Azure/k8s-create-secret@v1.1
       with:
         container-registry-url: ghcr.io
         container-registry-username: ${{ github.actor }}
         container-registry-password: ${{ env.DOCKER_PASSWORD }}
+        secret-name: ${{ env.IMAGE_PULL_SECRET_NAME }}  
+  deploy:
+      permissions:
+        actions: read
+        contents: read
+        id-token: write
+      runs-on: ubuntu-latest
+      needs: [createSecret]
+      steps:
+      # Checks out the repository this file is in
+      - uses: actions/checkout@v3
 
-        secret-name: ${{ env.IMAGE_PULL_SECRET_NAME }}
+      # Logs in with your Azure credentials
+      - name: Log in with Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
-    # Deploys application based on given manifest file
-    - name: Deploys application
-      uses: Azure/k8s-deploy@v3.1
-      with:
-        action: deploy
-        manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
-        images: ghcr.io/cvs-health-poc/pickled:latest
-        imagepullsecrets: ${{ env.IMAGE_PULL_SECRET_NAME }}
+      # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
+      - name: Get K8s context
+        uses: azure/aks-set-context@v2.0
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          
+      - name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      # Deploys application based on given manifest file
+      - name: Deploys application
+        uses: Azure/k8s-deploy@v3.1
+        with:
+          action: deploy
+          manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
+          images: ghcr.io/cvs-health-poc/pickled:latest
+          imagepullsecrets: ${{ env.IMAGE_PULL_SECRET_NAME }}
